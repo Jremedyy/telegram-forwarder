@@ -10,6 +10,11 @@ load_dotenv()
 API_ID = int(os.getenv("TELEGRAM_API_ID"))
 API_HASH = os.getenv("TELEGRAM_API_HASH")
 
+if not API_ID or not API_HASH:
+    raise ValueError("Missing required environment variables.")
+
+print(f"BOOTING UP!")
+
 # Initialize Telegram client
 client = TelegramClient('session_name', API_ID, API_HASH)
 
@@ -21,6 +26,7 @@ channel_to_webhook = {
 # Function to create dynamic handlers
 def setup_event_handlers(client, mapping):
     for channel_username, webhook_url in mapping.items():
+        print(f"now listening to: {channel_username}")
         @client.on(events.NewMessage(chats=channel_username))
         async def handler(event, webhook_url=webhook_url):
             # Get the message text
@@ -38,5 +44,7 @@ def setup_event_handlers(client, mapping):
 setup_event_handlers(client, channel_to_webhook)
 
 # Start the Telegram client
+print("Connecting to Telegram...")
 client.start()
+print("Connected to Telegram!")
 client.run_until_disconnected()
